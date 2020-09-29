@@ -21,4 +21,5 @@ public class BynderUploadException extends Exception {
     public BynderUploadException(final String message) {
         super(message);
     }
+
 }

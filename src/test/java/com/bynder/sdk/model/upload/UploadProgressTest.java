@@ -41,11 +41,7 @@ public class UploadProgressTest {
         assertEquals(0, uploadProgress.getUploadedChunks());
         assertEquals(0, uploadProgress.getTransmittedBytes());
         assertFalse(uploadProgress.isFinished());
-        assertFalse(uploadProgress.areChunksFinished());
         assertNull(uploadProgress.getSaveMediaResponse());
-
-        uploadProgress.setSaveMediaResponse(saveMediaResponse);
-        assertEquals(saveMediaResponse, uploadProgress.getSaveMediaResponse());
     }
 
     @Test
@@ -53,9 +49,6 @@ public class UploadProgressTest {
         uploadProgress.addProgress(1);
         assertEquals(1, uploadProgress.getUploadedChunks());
         assertEquals(1, uploadProgress.getTransmittedBytes());
-        assertTrue(uploadProgress.areChunksFinished());
-
-        uploadProgress.setFinished(true);
         assertTrue(uploadProgress.isFinished());
     }
 }

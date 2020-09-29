@@ -8,8 +8,10 @@ package com.bynder.sdk.query.upload;
 
 import com.bynder.sdk.query.MetapropertyAttribute;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Query with the information to upload a file.
@@ -20,6 +22,11 @@ public class UploadQuery {
      * File path of the file we want to upload.
      */
     private final String filepath;
+    /**
+     * Filename the uploaded file will get after uploading
+     * Optional: will be taken from the filepath if not specified.
+     */
+    private final String filename;
     /**
      * Brand id where we want to store the file.
      */
@@ -38,13 +45,26 @@ public class UploadQuery {
      */
     private List<MetapropertyAttribute> metaproperties;
 
+    private final UUID fileId;
+
+
     public UploadQuery(final String filepath, final String brandId) {
+        this(filepath, Paths.get(filepath).getFileName().toString(), brandId);
+    }
+
+    public UploadQuery(final String filepath, final String filename, final String brandId) {
         this.filepath = filepath;
+        this.filename = filename;
         this.brandId = brandId;
+        this.fileId = UUID.randomUUID();
     }
 
     public String getFilepath() {
         return filepath;
+    }
+
+    public String getFilename() {
+        return filename;
     }
 
     public String getBrandId() {
@@ -82,4 +102,9 @@ public class UploadQuery {
 
         return this;
     }
+
+    public UUID getFileId() {
+        return fileId;
+    }
+
 }

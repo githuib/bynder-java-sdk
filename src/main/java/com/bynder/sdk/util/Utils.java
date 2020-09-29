@@ -6,9 +6,21 @@
  */
 package com.bynder.sdk.util;
 
+import com.bynder.sdk.exception.BynderRequestError;
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import retrofit2.Response;
+
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -50,4 +62,74 @@ public final class Utils {
         expirationDate.add(Calendar.SECOND, -seconds);
         return expirationDate.before(Calendar.getInstance());
     }
+
+    /**
+     * Takes a SHA-256 hash of a byte array.
+     *
+     * @param bytes byte array to hash
+     * @return SHA-256 hash of the content
+     */
+    public static String sha256Hex(byte[] bytes) {
+        MessageDigest hasher;
+        try {
+            hasher = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            // Should never happen
+            return null;
+        }
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hasher.digest(bytes)) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    /**
+     * Takes a SHA-256 hash of a file.
+     *
+     * @param file file to hash
+     * @return SHA-256 hash of the file content
+     * @throws IOException when the file could not be read
+     */
+    public static String sha256Hex(File file)
+            throws IOException {
+        return sha256Hex(Files.readAllBytes(file.toPath()));
+    }
+
+    public static <T> Observable<Indexed<T>> mapWithIndex(Observable<T> observable) {
+        return mapWithIndex(observable, 0);
+    }
+
+    public static <T> Observable<Indexed<T>> mapWithIndex(Observable<T> observable, int startFrom) {
+        return observable.zipWith(
+                Observable.range(startFrom, Integer.MAX_VALUE),
+                Indexed::new
+        );
+    }
+
+//    public static <T> Flowable<Indexed<T>> mapWithIndex(Flowable<T> flowable) {
+//        return mapWithIndex(flowable, 0);
+//    }
+//
+//    public static <T> Flowable<Indexed<T>> mapWithIndex(Flowable<T> flowable, int startFrom) {
+//        return flowable.zipWith(Flowable.range(startFrom, Integer.MAX_VALUE), Indexed::new);
+//    }
+
+    public static <T> Single<Response<T>> handleRequest(Single<Response<T>> request) {
+        return Single.create(emitter -> request.subscribe(response -> {
+            if (!response.isSuccessful()) {
+                emitter.onError(new BynderRequestError(response));
+            }
+            emitter.onSuccess(response);
+        }, emitter::onError));
+    }
+
+    public static <T> Single<Response<T>> handleRequest(Observable<Response<T>> request) {
+        return handleRequest(request.singleOrError());
+    }
+
 }

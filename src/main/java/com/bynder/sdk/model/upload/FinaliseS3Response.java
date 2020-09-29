@@ -11,9 +11,9 @@ import com.bynder.sdk.api.BynderApi;
 import java.util.Map;
 
 /**
- * Model returned by {@link BynderApi#finaliseUpload(Map)}.
+ * Model returned by {@link BynderApi#finaliseS3Upload(Map)}.
  */
-public class FinaliseResponse {
+public class FinaliseS3Response {
 
     /**
      * Import id of the upload. Needed to poll and save media.

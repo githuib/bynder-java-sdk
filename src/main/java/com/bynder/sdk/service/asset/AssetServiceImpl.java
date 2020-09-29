@@ -9,14 +9,17 @@ package com.bynder.sdk.service.asset;
 import com.bynder.sdk.api.BynderApi;
 import com.bynder.sdk.model.*;
 import com.bynder.sdk.model.upload.SaveMediaResponse;
-import com.bynder.sdk.model.upload.UploadProgress;
 import com.bynder.sdk.query.*;
 import com.bynder.sdk.query.decoder.QueryDecoder;
 import com.bynder.sdk.query.upload.UploadQuery;
 import com.bynder.sdk.service.upload.FileUploader;
+import com.bynder.sdk.util.Indexed;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.Response;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,9 +36,7 @@ public class AssetServiceImpl implements AssetService {
      * Instance of {@link QueryDecoder} to decode query objects into API parameters.
      */
     private final QueryDecoder queryDecoder;
-    /**
-     * Instance to upload files to Bynder.
-     */
+
     private final FileUploader fileUploader;
 
     /**
@@ -165,7 +166,8 @@ public class AssetServiceImpl implements AssetService {
      * Check {@link AssetService} for more information.
      */
     @Override
-    public Observable<SaveMediaResponse> uploadFile(final UploadQuery uploadQuery) {
+    public Single<SaveMediaResponse> uploadFile(final UploadQuery uploadQuery)
+            throws IOException {
         return fileUploader.uploadFile(uploadQuery);
     }
 
@@ -173,7 +175,8 @@ public class AssetServiceImpl implements AssetService {
      * Check {@link AssetService} for more information.
      */
     @Override
-    public Observable<UploadProgress> uploadFileWithProgress(final UploadQuery uploadQuery) {
+    public Observable<Indexed<byte[]>> uploadFileWithProgress(final UploadQuery uploadQuery)
+            throws FileNotFoundException {
         return fileUploader.uploadFileWithProgress(uploadQuery);
     }
 }

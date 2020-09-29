@@ -13,9 +13,13 @@ import com.bynder.sdk.model.upload.UploadProgress;
 import com.bynder.sdk.query.*;
 import com.bynder.sdk.query.decoder.QueryDecoder;
 import com.bynder.sdk.query.upload.UploadQuery;
+import com.bynder.sdk.util.Indexed;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.Response;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -128,7 +132,8 @@ public interface AssetService {
      * @param uploadQuery Upload query with the information to upload the file.
      * @return {@link Observable} with the {@link SaveMediaResponse} information.
      */
-    Observable<SaveMediaResponse> uploadFile(UploadQuery uploadQuery);
+    Single<SaveMediaResponse> uploadFile(UploadQuery uploadQuery)
+            throws IOException;
 
     /**
      * Uploads a file with Progress Report.
@@ -136,7 +141,8 @@ public interface AssetService {
      * @param uploadQuery Upload query with the information to upload the file.
      * @return {@link Observable} with the {@link UploadProgress} information.
      */
-    Observable<UploadProgress> uploadFileWithProgress(UploadQuery uploadQuery);
+    Observable<Indexed<byte[]>> uploadFileWithProgress(UploadQuery uploadQuery)
+            throws FileNotFoundException;
 
     /**
      * Builder class used to create a new instance of {@link AssetService}.

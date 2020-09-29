@@ -47,17 +47,16 @@ public class ApiFactory {
      * @return Implementation instance of the {@link BynderApi} interface.
      */
     public static BynderApi createBynderClient(final Configuration configuration) {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Boolean.class, new BooleanTypeAdapter());
+        GsonBuilder gsonBuilder = new GsonBuilder().registerTypeAdapter(Boolean.class, new BooleanTypeAdapter());
 
-        Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
-            .baseUrl(configuration.getBaseUrl().toString())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(new StringConverterFactory())
-            .addConverterFactory(GsonConverterFactory.create(gsonBuilder.create()));
-
-        Retrofit retrofit = retrofitBuilder.client(createOkHttpClient(configuration)).build();
-        return retrofit.create(BynderApi.class);
+        return new Retrofit.Builder()
+                .baseUrl(configuration.getBaseUrl().toString())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(new StringConverterFactory())
+                .addConverterFactory(GsonConverterFactory.create(gsonBuilder.create()))
+                .client(createOkHttpClient(configuration))
+                .build()
+                .create(BynderApi.class);
     }
 
     /**
@@ -68,11 +67,12 @@ public class ApiFactory {
      * @return Implementation instance of the {@link OAuthApi} interface.
      */
     public static AmazonS3Api createAmazonS3Client(final String bucket) {
-        Retrofit.Builder retrofitBuilder = new Retrofit.Builder().baseUrl(bucket)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
 
-        Retrofit retrofit = retrofitBuilder.build();
-        return retrofit.create(AmazonS3Api.class);
+        return new Retrofit.Builder()
+                .baseUrl(bucket)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build()
+                .create(AmazonS3Api.class);
     }
 
     /**
@@ -83,12 +83,13 @@ public class ApiFactory {
      * @return Implementation instance of the {@link OAuthApi} interface.
      */
     public static OAuthApi createOAuthClient(final String baseUrl) {
-        Retrofit.Builder retrofitBuilder = new Retrofit.Builder().baseUrl(baseUrl)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create());
 
-        Retrofit retrofit = retrofitBuilder.build();
-        return retrofit.create(OAuthApi.class);
+        return new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(OAuthApi.class);
     }
 
     /**
@@ -105,9 +106,14 @@ public class ApiFactory {
         } else {
             setPermanentTokenInterceptor(httpClientBuilder, configuration);
         }
+//        httpClientBuilder.addInterceptor(new Interceptor() {
+//            @Override
+//            public Response intercept(final Chain chain) throws IOException {
+//                return chain.proceed(chain.request().newBuilder().build());
+//            }
+//        });
 
-        HttpConnectionSettings httpConnectionSettings = configuration.getHttpConnectionSettings();
-        setHttpConnectionSettings(httpClientBuilder, httpConnectionSettings);
+        setHttpConnectionSettings(httpClientBuilder, configuration.getHttpConnectionSettings());
 
         return httpClientBuilder.build();
     }
@@ -121,34 +127,27 @@ public class ApiFactory {
      */
     private static void setOAuthInterceptor(final Builder httpClientBuilder,
         final Configuration configuration) {
-        httpClientBuilder.addInterceptor(new Interceptor() {
-
-            @Override
-            public Response intercept(final Chain chain) throws IOException {
-                if (configuration.getOAuthSettings().getToken() == null) {
-                    throw new BynderRuntimeException("Token is not defined in Configuration");
-                }
-
-                // check if access token is expiring in the next 15 seconds
-                if (Utils.isDateExpiring(configuration.getOAuthSettings().getToken().getAccessTokenExpiration(), 15)) {
-                    // refresh the access token
-                    OAuthService oAuthService = BynderClient.Builder.create(configuration)
-                        .getOAuthService();
-                    Token token = oAuthService.refreshAccessToken().blockingSingle();
-
-                    // trigger callback method
-                    configuration.getOAuthSettings().callback(token);
-                }
-
-                String headerValue = String
-                    .format("%s %s", "Bearer", configuration.getOAuthSettings().getToken().getAccessToken());
-
-                Request.Builder requestBuilder = chain.request().newBuilder()
-                    .header("Authorization", headerValue);
-
-                Request request = requestBuilder.build();
-                return chain.proceed(request);
+        httpClientBuilder.addInterceptor(chain -> {
+            if (configuration.getOAuthSettings().getToken() == null) {
+                throw new BynderRuntimeException("Token is not defined in Configuration");
             }
+
+            // check if access token is expiring in the next 15 seconds
+            if (Utils.isDateExpiring(configuration.getOAuthSettings().getToken().getAccessTokenExpiration(), 15)) {
+                // refresh the access token
+                OAuthService oAuthService = BynderClient.Builder.create(configuration).getOAuthService();
+                Token token = oAuthService.refreshAccessToken().blockingSingle();
+
+                // trigger callback method
+                configuration.getOAuthSettings().callback(token);
+            }
+
+            Request.Builder requestBuilder = chain.request().newBuilder().header(
+                    "Authorization",
+                    String.format("%s %s", "Bearer", configuration.getOAuthSettings().getToken().getAccessToken())
+            );
+
+            return chain.proceed(requestBuilder.build());
         });
     }
 
@@ -161,18 +160,14 @@ public class ApiFactory {
     */
     private static void setPermanentTokenInterceptor(final Builder httpClientBuilder,
         final Configuration configuration) {
-        httpClientBuilder.addInterceptor(new Interceptor() {
+        httpClientBuilder.addInterceptor(chain -> {
 
-            @Override
-            public Response intercept(final Chain chain) throws IOException {
-                String headerValue = String.format("%s %s", "Bearer", configuration.getPermanentToken());
+            Request.Builder requestBuilder = chain.request().newBuilder().header(
+                    "Authorization",
+                    String.format("%s %s", "Bearer", configuration.getPermanentToken())
+            );
 
-                Request.Builder requestBuilder =
-                    chain.request().newBuilder().header("Authorization", headerValue);
-
-                Request request = requestBuilder.build();
-                return chain.proceed(request);
-            }
+            return chain.proceed(requestBuilder.build());
         });
     }
 
@@ -183,12 +178,14 @@ public class ApiFactory {
      * @param httpConnectionSettings HTTP connection settings for the HTTP communication with
      * Bynder.
      */
-    private static void setHttpConnectionSettings(final Builder httpClientBuilder,
-        final HttpConnectionSettings httpConnectionSettings) {
+    private static void setHttpConnectionSettings(
+            final Builder httpClientBuilder,
+            final HttpConnectionSettings httpConnectionSettings
+    ) {
         if (httpConnectionSettings.isLoggingInterceptorEnabled()) {
-            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
-            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            httpClientBuilder.addInterceptor(httpLoggingInterceptor);
+            httpClientBuilder.addInterceptor(
+                    new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+            );
         }
 
         if (httpConnectionSettings.getCustomInterceptor() != null) {
@@ -196,19 +193,17 @@ public class ApiFactory {
         }
 
         httpClientBuilder
-            .retryOnConnectionFailure(httpConnectionSettings.isRetryOnConnectionFailure());
-        httpClientBuilder
-            .readTimeout(httpConnectionSettings.getReadTimeoutSeconds(), TimeUnit.SECONDS);
-        httpClientBuilder
-            .connectTimeout(httpConnectionSettings.getConnectTimeoutSeconds(), TimeUnit.SECONDS);
-        httpClientBuilder
-            .writeTimeout(httpConnectionSettings.getConnectTimeoutSeconds(), TimeUnit.SECONDS);
+                .retryOnConnectionFailure(httpConnectionSettings.isRetryOnConnectionFailure())
+                .readTimeout(httpConnectionSettings.getReadTimeoutSeconds(), TimeUnit.SECONDS)
+                .connectTimeout(httpConnectionSettings.getConnectTimeoutSeconds(), TimeUnit.SECONDS)
+                .writeTimeout(httpConnectionSettings.getConnectTimeoutSeconds(), TimeUnit.SECONDS);
 
         if (httpConnectionSettings.getSslContext() != null
-            && httpConnectionSettings.getTrustManager() != null) {
-            httpClientBuilder
-                .sslSocketFactory(httpConnectionSettings.getSslContext().getSocketFactory(),
-                    httpConnectionSettings.getTrustManager());
+                && httpConnectionSettings.getTrustManager() != null) {
+            httpClientBuilder.sslSocketFactory(
+                    httpConnectionSettings.getSslContext().getSocketFactory(),
+                    httpConnectionSettings.getTrustManager()
+            );
         }
     }
 }

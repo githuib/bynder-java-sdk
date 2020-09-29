@@ -13,7 +13,7 @@ import java.util.Map;
 
 /**
  * Model to represent the authorisation information to start an upload returned by
- * {@link BynderApi#getUploadInformation(Map)}. This model is only and should be only used when
+ * {@link BynderApi#getUploadInformation(Map)}. This model should be only used when
  * uploading a file.
  */
 public class UploadRequest {

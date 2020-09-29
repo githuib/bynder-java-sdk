@@ -16,10 +16,6 @@ public class UploadProgress {
      */
     private final long totalBytes;
     /**
-     * Whether the upload has finished or not.
-     */
-    private boolean finished;
-    /**
      * The SaveMediaResponse of the upload, filled in when the upload is finished.
      */
     private SaveMediaResponse saveMediaResponse;
@@ -36,23 +32,6 @@ public class UploadProgress {
         this.uploadedChunks = 0;
         this.totalBytes = totalBytes;
         this.transmittedBytes = 0;
-        this.finished = false;
-    }
-
-    public boolean isFinished() {
-        return finished;
-    }
-
-    public void setFinished(boolean finished) {
-        this.finished = finished;
-    }
-
-    public SaveMediaResponse getSaveMediaResponse() {
-        return saveMediaResponse;
-    }
-
-    public void setSaveMediaResponse(SaveMediaResponse saveMediaResponse) {
-        this.saveMediaResponse = saveMediaResponse;
     }
 
     /**
@@ -65,13 +44,7 @@ public class UploadProgress {
         uploadedChunks++;
     }
 
-    /**
-     * Whether all Bytes of the Asset have been uploaded.
-     * Not the same as isFinished().
-     *
-     * @return boolean indicating whether chunk transmission is finished.
-     */
-    public boolean areChunksFinished() {
+    public boolean isFinished() {
         return transmittedBytes == totalBytes;
     }
 
@@ -86,4 +59,13 @@ public class UploadProgress {
     public long getTotalBytes() {
         return totalBytes;
     }
+
+    public SaveMediaResponse getSaveMediaResponse() {
+        return saveMediaResponse;
+    }
+
+    public void setSaveMediaResponse(SaveMediaResponse saveMediaResponse) {
+        this.saveMediaResponse = saveMediaResponse;
+    }
+
 }

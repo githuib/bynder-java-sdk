@@ -41,10 +41,14 @@ public class RegisterChunkQuery {
     @ApiField
     private final String filename;
 
-    public RegisterChunkQuery(final String uploadId, final int chunkNumber, final String targetId,
-        final String filename) {
-        this.uploadId = uploadId;
+    public RegisterChunkQuery(
+            final int chunkNumber,
+            final String uploadId,
+            final String targetId,
+            final String filename
+    ) {
         this.chunkNumber = chunkNumber;
+        this.uploadId = uploadId;
         this.targetId = targetId;
         this.filename = filename;
     }

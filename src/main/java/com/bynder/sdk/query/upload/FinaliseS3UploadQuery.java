@@ -6,12 +6,13 @@
  */
 package com.bynder.sdk.query.upload;
 
+import com.bynder.sdk.model.upload.UploadRequest;
 import com.bynder.sdk.query.decoder.ApiField;
 
 /**
  * Query with the information to finalise a completely uploaded file.
  */
-public class FinaliseUploadQuery {
+public class FinaliseS3UploadQuery {
 
     /**
      * Upload id for the file being uploaded.
@@ -37,11 +38,10 @@ public class FinaliseUploadQuery {
     @ApiField
     private final int chunks;
 
-    public FinaliseUploadQuery(final String uploadId, final String targetId,
-        final String s3Filename, final int chunks) {
-        this.uploadId = uploadId;
-        this.targetId = targetId;
-        this.s3Filename = s3Filename;
+    public FinaliseS3UploadQuery(final UploadRequest uploadRequest, final int chunks) {
+        this.uploadId = uploadRequest.getS3File().getUploadId();
+        this.targetId = uploadRequest.getS3File().getTargetId();
+        this.s3Filename = uploadRequest.getS3Filename();
         this.chunks = chunks;
     }
 

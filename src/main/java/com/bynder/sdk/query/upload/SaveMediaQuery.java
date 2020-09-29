@@ -11,17 +11,12 @@ import com.bynder.sdk.query.decoder.ApiField;
 import com.bynder.sdk.query.decoder.MetapropertyAttributesDecoder;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Query with the information to save a media asset.
  */
 public class SaveMediaQuery {
-
-    /**
-     * Import id of a finalised and processed upload to save.
-     */
-    @ApiField
-    private final String importId;
 
     /**
      * Brand id to save the media asset to.
@@ -40,27 +35,20 @@ public class SaveMediaQuery {
      */
     @ApiField(name = "id")
     private String mediaId;
+
     /**
      * Flags if the media asset should be sent to the waiting room.
      */
     @ApiField
     private Boolean audit;
+
     /**
      * Dictionary with (metaproperty) options to set on the asset upon upload.
      */
     @ApiField(name = "metaproperty", decoder = MetapropertyAttributesDecoder.class)
     private List<MetapropertyAttribute> metaproperties;
 
-    public SaveMediaQuery(final String importId) {
-        this.importId = importId;
-    }
-
-    public String getImportId() {
-        return importId;
-    }
-
-    public String getBrandId() {
-        return brandId;
+    public SaveMediaQuery() {
     }
 
     public SaveMediaQuery setBrandId(final String brandId) {
@@ -68,17 +56,9 @@ public class SaveMediaQuery {
         return this;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public SaveMediaQuery setName(final String name) {
         this.name = name;
         return this;
-    }
-
-    public String getMediaId() {
-        return mediaId;
     }
 
     public SaveMediaQuery setMediaId(final String mediaId) {
@@ -96,7 +76,4 @@ public class SaveMediaQuery {
         return this;
     }
 
-    public List<MetapropertyAttribute> getMetaproperties() {
-        return metaproperties;
-    }
 }

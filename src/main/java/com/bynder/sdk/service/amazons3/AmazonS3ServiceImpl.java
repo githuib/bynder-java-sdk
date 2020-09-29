@@ -10,10 +10,11 @@ import com.bynder.sdk.api.AmazonS3Api;
 import com.bynder.sdk.api.ApiFactory;
 import com.bynder.sdk.model.upload.MultipartParameters;
 import com.bynder.sdk.model.upload.UploadRequest;
-import io.reactivex.Observable;
+import com.bynder.sdk.util.Indexed;
+import com.bynder.sdk.util.Utils;
+import io.reactivex.Completable;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import retrofit2.Response;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -43,23 +44,21 @@ public class AmazonS3ServiceImpl implements AmazonS3Service {
      * Check {@link AmazonS3Service} for more information.
      */
     @Override
-    public Observable<Response<Void>> uploadPartToAmazon(
+    public Completable uploadPartToAmazon(
+            final Indexed<byte[]> chunk,
             final String filename,
-            final UploadRequest uploadRequest,
-            final int chunkNumber,
-            final byte[] fileContent,
-            final int numberOfChunks
+            final int numberOfChunks,
+            final MultipartParameters multipartParams
     ) {
         Map<String, RequestBody> params = new LinkedHashMap<>();
 
-        MultipartParameters multipartParams = uploadRequest.getMultipartParams();
         RequestBody key = encodeField(
-                String.format("%s/p%s", multipartParams.getKey(), chunkNumber)
+                String.format("%s/p%s", multipartParams.getKey(), chunk.getIndex())
         );
 
-        params.put("chunk", encodeField(String.valueOf(chunkNumber)));
+        params.put("chunk", encodeField(String.valueOf(chunk.getIndex())));
         params.put("chunks", encodeField(String.valueOf(numberOfChunks)));
-        params.put("file", encodeField(fileContent));
+        params.put("file", encodeField(chunk.getValue()));
         params.put("Filename", key);
         params.put("key", key);
         params.put("name", encodeField(filename));
@@ -73,7 +72,7 @@ public class AmazonS3ServiceImpl implements AmazonS3Service {
         params.put("x-amz-date", encodeField(multipartParams.getDate()));
         params.put("X-Amz-Signature", encodeField(multipartParams.getSignature()));
 
-        return amazonS3Api.uploadPartToAmazon(params);
+        return Utils.handleRequest(amazonS3Api.uploadPartToAmazon(params)).ignoreElement();
     }
 
     private RequestBody encodeField(byte[] field) {

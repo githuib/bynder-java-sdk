@@ -8,7 +8,8 @@ package com.bynder.sdk.api;
 
 import com.bynder.sdk.configuration.Configuration;
 import com.bynder.sdk.configuration.HttpConnectionSettings;
-import com.bynder.sdk.exception.BynderRuntimeException;
+import com.bynder.sdk.configuration.OAuthSettings;
+import com.bynder.sdk.model.oauth.Token;
 import com.bynder.sdk.service.BynderClient;
 import com.bynder.sdk.util.BooleanTypeAdapter;
 import com.bynder.sdk.util.StringConverterFactory;
@@ -58,11 +59,11 @@ public class ApiFactory {
     }
 
     /**
-     * Creates an implementation of the Bynder OAuth2 endpoints defined in the {@link OAuthApi}
+     * Creates an implementation of the Amazon S3 endpoints defined in the {@link AmazonS3Api}
      * interface.
      *
      * @param bucket AWS bucket URL.
-     * @return Implementation instance of the {@link OAuthApi} interface.
+     * @return Implementation instance of the {@link AmazonS3Api} interface.
      */
     public static AmazonS3Api createAmazonS3Client(final String bucket) {
         return new Retrofit.Builder()
@@ -72,15 +73,15 @@ public class ApiFactory {
     }
 
     /**
-     * Creates an implementation of the Amazon S3 endpoints defined in the {@link AmazonS3Api}
+     * Creates an implementation of the Bynder OAuth2 endpoints defined in the {@link OAuthApi}
      * interface.
      *
-     * @param baseUrl Bynder portal base URL.
+     * @param configuration {@link Configuration} settings for the HTTP communication with Bynder.
      * @return Implementation instance of the {@link OAuthApi} interface.
      */
-    public static OAuthApi createOAuthClient(final String baseUrl) {
+    public static OAuthApi createOAuthClient(final Configuration configuration) {
         return new Retrofit.Builder()
-                .baseUrl(baseUrl)
+                .baseUrl(configuration.getBaseUrl())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build().create(OAuthApi.class);
@@ -89,7 +90,7 @@ public class ApiFactory {
     /**
      * Creates an instance of {@link OkHttpClient}.
      *
-     * @param configuration Configuration settings for the HTTP communication with Bynder.
+     * @param configuration {@link Configuration} settings for the HTTP communication with Bynder.
      * @return {@link OkHttpClient} instance used for API requests.
      */
     private static OkHttpClient createOkHttpClient(final Configuration configuration) {
@@ -116,14 +117,13 @@ public class ApiFactory {
             final Configuration configuration
     ) {
         httpClientBuilder.addInterceptor(chain -> {
-            if (configuration.getOAuthSettings().getToken() == null) {
-                throw new BynderRuntimeException("Token is not defined in Configuration");
-            }
+            OAuthSettings oAuthSettings = configuration.getOAuthSettings();
+            Token token = oAuthSettings.getToken();
 
             // check if access token is expiring in the next 15 seconds
-            if (Utils.isDateExpiring(configuration.getOAuthSettings().getToken().getAccessTokenExpiration(), 15)) {
+            if (Utils.isDateExpiring(token.getAccessTokenExpiration(), 15)) {
                 // refresh the access token
-                configuration.getOAuthSettings().callback(
+                oAuthSettings.callback(
                         BynderClient.Builder.create(configuration)
                                 .getOAuthService()
                                 .refreshAccessToken()
@@ -131,10 +131,9 @@ public class ApiFactory {
                 );
             }
 
-            return chain.proceed(addAuthHeader(
-                    chain.request(),
-                    configuration.getOAuthSettings().getToken().getAccessToken()
-            ));
+            return chain.proceed(
+                    addAuthHeader(chain.request(), token.getAccessToken())
+            );
         });
     }
 
@@ -158,8 +157,7 @@ public class ApiFactory {
      * Sets the HTTP connection settings for the HTTP client.
      *
      * @param httpClientBuilder Builder instance of the HTTP client.
-     * @param configuration HTTP connection settings for the HTTP communication with
-     * Bynder.
+     * @param configuration {@link Configuration} settings for the HTTP communication with Bynder.
      */
     private static void setHttpConnectionSettings(
             final Builder httpClientBuilder,

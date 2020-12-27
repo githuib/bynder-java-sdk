@@ -39,7 +39,7 @@ public class BynderClientImpl implements BynderClient {
      * Configuration settings needed to instantiate the different interfaces and services of the
      * SDK client.
      */
-    private Configuration configuration;
+    private final Configuration configuration;
     /**
      * Instance of {@link OAuthService}.
      */
@@ -62,7 +62,7 @@ public class BynderClientImpl implements BynderClient {
     BynderClientImpl(final Configuration configuration, final QueryDecoder decoder) {
         this.configuration = configuration;
         this.queryDecoder = decoder;
-        oauthClient = ApiFactory.createOAuthClient(configuration.getBaseUrl().toString());
+        oauthClient = ApiFactory.createOAuthClient(configuration);
         bynderApi = ApiFactory.createBynderClient(configuration);
     }
 

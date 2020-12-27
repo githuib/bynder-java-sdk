@@ -27,7 +27,8 @@ import static org.junit.Assert.assertNotNull;
  */
 public class ApiFactoryTest {
 
-    public static String BASE_URL = "https://example.bynder.com";
+    private static String BASE_URL = "https://example.com";
+    private static String S3_BUCKET = "https://bucket";
 
     @Mock
     private Configuration configuration;
@@ -35,7 +36,8 @@ public class ApiFactoryTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        Mockito.when(configuration.getBaseUrl()).thenReturn(new URL(BASE_URL));
+        Mockito.when(configuration.getBaseUrl())
+                .thenReturn(new URL(BASE_URL));
         Mockito.when(configuration.getHttpConnectionSettings())
             .thenReturn(new HttpConnectionSettings());
     }
@@ -48,13 +50,13 @@ public class ApiFactoryTest {
 
     @Test
     public void createAmazonS3Client() {
-        AmazonS3Api amazonS3Api = ApiFactory.createAmazonS3Client(BASE_URL);
+        AmazonS3Api amazonS3Api = ApiFactory.createAmazonS3Client(S3_BUCKET);
         assertNotNull(amazonS3Api);
     }
 
     @Test
     public void createOAuthClient() {
-        OAuthApi oAuthApi = ApiFactory.createOAuthClient(BASE_URL);
+        OAuthApi oAuthApi = ApiFactory.createOAuthClient(configuration);
         assertNotNull(oAuthApi);
     }
 }

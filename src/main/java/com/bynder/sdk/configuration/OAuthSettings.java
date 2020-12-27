@@ -32,12 +32,7 @@ public class OAuthSettings {
     /**
      * Optional callback method to be triggered when token is refreshed.
      */
-    private RefreshTokenCallback callback = new RefreshTokenCallback() {
-        @Override
-        public void execute(Token token) {
-            return;
-        }
-    };
+    private RefreshTokenCallback callback = token -> {};
 
     public OAuthSettings() {
     }
@@ -49,9 +44,7 @@ public class OAuthSettings {
     }
 
     public OAuthSettings(String clientId, String clientSecret, URI redirectUri, RefreshTokenCallback callback) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.redirectUri = redirectUri;
+        this(clientId, clientSecret, redirectUri);
         this.callback = callback;
     }
 
@@ -68,6 +61,9 @@ public class OAuthSettings {
     }
 
     public Token getToken() {
+        if (token == null) {
+            throw new RuntimeException("Token is not defined in Configuration");
+        }
         return token;
     }
 

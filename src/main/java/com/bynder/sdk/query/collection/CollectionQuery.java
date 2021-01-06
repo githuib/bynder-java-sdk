@@ -19,21 +19,24 @@ public class CollectionQuery {
      */
     @ApiField
     private String keyword;
+
     /**
      * Limit of results per request. Maximum: 1000. Default: 50.
      */
     @ApiField
     private Integer limit;
+
     /**
      * Page to be retrieved.
      */
     @ApiField
     private Integer page;
+
     /**
      * Desired order for the returned collection results.
      */
     @ApiField
-    private CollectionOrderType orderBy;
+    private CollectionOrderBy orderBy;
 
     public String getKeyword() {
         return keyword;
@@ -62,11 +65,11 @@ public class CollectionQuery {
         return this;
     }
 
-    public CollectionOrderType getOrderBy() {
+    public CollectionOrderBy getOrderBy() {
         return orderBy;
     }
 
-    public CollectionQuery setOrderBy(final CollectionOrderType orderBy) {
+    public CollectionQuery setOrderBy(final CollectionOrderBy orderBy) {
         this.orderBy = orderBy;
         return this;
     }

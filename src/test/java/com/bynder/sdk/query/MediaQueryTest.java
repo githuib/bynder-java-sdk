@@ -30,7 +30,7 @@ public class MediaQueryTest {
     public static final Boolean EXPECTED_BOOLEAN = Boolean.TRUE;
     public static final String EXPECTED_OPTION1 = "option1";
     public static final String EXPECTED_OPTION2 = "option2";
-    public static final OrderBy EXPECTED_ORDER = OrderBy.DATE_CREATED_ASC;
+    public static final MediaOrderBy EXPECTED_ORDER = MediaOrderBy.DATE_CREATED_ASC;
     public static final String EXPECTED_METAPROPERTY_NAME = "metapropertyName";
     public static final String EXPECTED_METAPROPERTY_OPTION = "metapropertyOption";
 

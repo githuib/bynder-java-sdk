@@ -15,15 +15,15 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests the {@link CollectionOrderType} enum.
+ * Tests the {@link CollectionOrderBy} enum.
  */
-public class CollectionOrderTypeTest {
+public class CollectionOrderByTest {
 
     @Test
     public void enumValuesForCollectionOrderType() {
-        assertEquals("dateCreated asc", CollectionOrderType.DATE_CREATED_ASC.toString());
-        assertEquals("dateCreated desc", CollectionOrderType.DATE_CREATED_DESC.toString());
-        assertEquals("name asc", CollectionOrderType.NAME_ASC.toString());
-        assertEquals("name desc", CollectionOrderType.NAME_DESC.toString());
+        assertEquals("dateCreated asc", CollectionOrderBy.DATE_CREATED_ASC.toString());
+        assertEquals("dateCreated desc", CollectionOrderBy.DATE_CREATED_DESC.toString());
+        assertEquals("name asc", CollectionOrderBy.NAME_ASC.toString());
+        assertEquals("name desc", CollectionOrderBy.NAME_DESC.toString());
     }
 }

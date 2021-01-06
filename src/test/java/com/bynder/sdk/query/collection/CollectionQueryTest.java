@@ -22,8 +22,8 @@ public class CollectionQueryTest {
 
     public static final String EXPECTED_KEYWORD = "keyword";
     public static final int EXPECTED_INTEGER = 1;
-    public static final CollectionOrderType EXPECTED_ORDER_BY =
-        CollectionOrderType.DATE_CREATED_ASC;
+    public static final CollectionOrderBy EXPECTED_ORDER_BY =
+        CollectionOrderBy.DATE_CREATED_ASC;
 
     @Test
     public void initializeEmptyCollectionQuery() {

@@ -15,17 +15,17 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests the {@link OrderBy} enum.
+ * Tests the {@link MediaOrderBy} enum.
  */
-public class OrderByTest {
+public class MediaOrderByTest {
 
     @Test
     public void enumValuesForOrderBy() {
-        assertEquals("dateCreated asc", OrderBy.DATE_CREATED_ASC.toString());
-        assertEquals("dateCreated desc", OrderBy.DATE_CREATED_DESC.toString());
-        assertEquals("dateModified asc", OrderBy.DATE_MODIFIED_ASC.toString());
-        assertEquals("dateModified desc", OrderBy.DATE_MODIFIED_DESC.toString());
-        assertEquals("name asc", OrderBy.NAME_ASC.toString());
-        assertEquals("name desc", OrderBy.NAME_DESC.toString());
+        assertEquals("dateCreated asc", MediaOrderBy.DATE_CREATED_ASC.toString());
+        assertEquals("dateCreated desc", MediaOrderBy.DATE_CREATED_DESC.toString());
+        assertEquals("dateModified asc", MediaOrderBy.DATE_MODIFIED_ASC.toString());
+        assertEquals("dateModified desc", MediaOrderBy.DATE_MODIFIED_DESC.toString());
+        assertEquals("name asc", MediaOrderBy.NAME_ASC.toString());
+        assertEquals("name desc", MediaOrderBy.NAME_DESC.toString());
     }
 }

@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Converts parameter value from string array to a string of comma separated values to send to API.
  */
-public class StringArrayParameterDecoder implements ParameterDecoder<String, String[]> {
+public class StringArrayParameterDecoder implements ParameterDecoder<String[]> {
 
     @Override
     public Map<String, String> decode(final String name, final String[] value) {
@@ -20,4 +20,5 @@ public class StringArrayParameterDecoder implements ParameterDecoder<String, Str
         parameters.put(name, String.join(",", value));
         return parameters;
     }
+
 }

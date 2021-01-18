@@ -12,10 +12,10 @@ import java.util.Map;
  * Decoder interface to use in queries to convert parameter name and value from one specific type
  * to {@link Map}.
  *
- * @param <N> Parameter name type.
  * @param <V> Parameter value type.
  */
-public interface ParameterDecoder<N, V> {
+public interface ParameterDecoder<V> {
 
-    Map<String, String> decode(N name, V value);
+    Map<String, String> decode(String name, V value);
+
 }

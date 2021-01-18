@@ -26,5 +26,6 @@ public @interface ApiField {
      */
     String name() default DEFAULT_NAME;
 
-    Class<?> decoder() default void.class;
+    Class<? extends ParameterDecoder<?>> decoder() default DefaultDecoder.class;
+
 }

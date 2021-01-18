@@ -14,13 +14,12 @@ import java.util.Map;
 /**
  * Converts parameter name from string to "property_name" to send to API.
  */
-public class JsonParameterDecoder implements ParameterDecoder<String, String[]> {
+public class JsonParameterDecoder implements ParameterDecoder<String[]> {
 
     @Override
     public Map<String, String> decode(final String name, final String[] values) {
         Map<String, String> parameters = new HashMap<>();
-        Gson gson = new Gson();
-        parameters.put(name, gson.toJson(values));
+        parameters.put(name, new Gson().toJson(values));
         return parameters;
     }
 }

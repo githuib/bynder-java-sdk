@@ -24,27 +24,22 @@ public class QueryDecoder {
      * @param parameters Parameters name/value pairs to send to the API.
      * @throws IllegalAccessException If the Field object is inaccessible.
      */
-    private static void convertField(final Field field, final Object query,
-        final Map<String, String> parameters) throws IllegalAccessException {
+    private static void convertField(
+            final Field field,
+            final Object query,
+            final Map<String, String> parameters
+    ) throws IllegalAccessException, InstantiationException {
         field.setAccessible(true);
+
         ApiField apiField = field.getAnnotation(ApiField.class);
         Object fieldValue = field.get(query);
         if (apiField != null && fieldValue != null) {
-            String name =
-                ApiField.DEFAULT_NAME.equals(apiField.name()) ? field.getName() : apiField.name();
+            String name = ApiField.DEFAULT_NAME.equals(apiField.name())
+                    ? field.getName()
+                    : apiField.name();
 
-            if (apiField.decoder().equals(void.class)) {
-                parameters.put(name, fieldValue.toString());
-            } else {
-                ParameterDecoder parameterDecoder = null;
-                try {
-                    parameterDecoder = (ParameterDecoder) apiField.decoder().newInstance();
-                } catch (InstantiationException e) {
-                    // Failed to instantiate class. Nothing to do.
-                }
-
-                parameters.putAll(parameterDecoder.decode(name, fieldValue));
-            }
+            ParameterDecoder decoder = apiField.decoder().newInstance();
+            parameters.putAll(decoder.decode(name, fieldValue));
         }
 
         field.setAccessible(false);
@@ -60,24 +55,17 @@ public class QueryDecoder {
     public Map<String, String> decode(final Object query) {
         Map<String, String> parameters = new HashMap<>();
         if (query != null) {
-            List<Field> fields = new ArrayList<>();
-
-            fields.addAll(Arrays.asList(query.getClass().getDeclaredFields()));
-
-            if (query.getClass().getSuperclass().getDeclaredFields() != null) {
-                fields.addAll(Arrays.asList(query.getClass().getSuperclass().getDeclaredFields()));
-            }
-
+            List<Field> fields = new ArrayList<>(Arrays.asList(query.getClass().getDeclaredFields()));
+            fields.addAll(Arrays.asList(query.getClass().getSuperclass().getDeclaredFields()));
             for (Field field : fields) {
                 try {
                     convertField(field, query, parameters);
-                } catch (IllegalAccessException e) {
+                } catch (IllegalAccessException | InstantiationException e) {
                     // Nothing to do. This will never happen as
                     // we are iterating over the fields.
                 }
             }
         }
-
         return parameters;
     }
 }

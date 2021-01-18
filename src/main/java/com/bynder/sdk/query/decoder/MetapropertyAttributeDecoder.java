@@ -14,14 +14,15 @@ import java.util.Map;
 /**
  * Converts attribute name from string to "metaproperty.name" to send to API.
  */
-public class MetapropertyAttributeDecoder implements
-    ParameterDecoder<String, MetapropertyAttribute> {
+public class MetapropertyAttributeDecoder implements ParameterDecoder<MetapropertyAttribute> {
 
     @Override
     public Map<String, String> decode(final String name, final MetapropertyAttribute value) {
         Map<String, String> parameters = new HashMap<>();
-        parameters.put(String.format("%s.%s", name, value.getMetapropertyId()),
-            String.join(",", value.getOptionsIds()));
+        parameters.put(
+                String.format("%s.%s", name, value.getMetapropertyId()),
+                String.join(",", value.getOptionsIds())
+        );
         return parameters;
     }
 }

@@ -12,12 +12,12 @@ import java.util.Map;
 /**
  * Converts parameter value from boolean to integer 1 (true) or 0 (false) to send to API.
  */
-public class BooleanParameterDecoder implements ParameterDecoder<String, Boolean> {
+public class BooleanParameterDecoder implements ParameterDecoder<Boolean> {
 
     @Override
     public Map<String, String> decode(final String name, final Boolean value) {
         Map<String, String> parameters = new HashMap<>();
-        parameters.put(name, value.booleanValue() ? "1" : "0");
+        parameters.put(name, value ? "1" : "0");
         return parameters;
     }
 }

@@ -69,7 +69,7 @@ public class QueryParameterDecoderTest {
         }
     }
 
-    static class MockDecoder implements ParameterDecoder<String, String> {
+    static class MockDecoder implements ParameterDecoder<String> {
 
         @Override
         public Map<String, String> decode(String name, String value) {

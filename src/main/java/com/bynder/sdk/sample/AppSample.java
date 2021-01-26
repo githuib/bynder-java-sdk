@@ -43,6 +43,7 @@ public class AppSample {
     public static void main(final String[] args)
             throws IOException, URISyntaxException {
         AppSample app = new AppSample(
+<<<<<<< Updated upstream
                 "https://example.com",
                 "OAuth2 client ID",
                 "Oauth2 client secret",
@@ -53,9 +54,43 @@ public class AppSample {
                     LOG.info(String.format("New access token: %s", token.getAccessToken()));
                     LOG.info(String.format("New access token expiration date: %s", token.getAccessTokenExpiration()));
                 }
+=======
+//                "https://example.com",
+                "https://arrakis.bynder-stage.com",
+//                "https://lorraine.getbynder.com",
+                new OAuthSettings.Builder(
+//                        "OAuth2 client ID",
+//                        "Oauth2 client secret"
+//                "e6e8d179-3450-42f1-9b41-9b3886e49eb3", // arrakis normal
+//                "0a453934-e95f-48c0-94b9-cd809b796b95",
+                    "0e4b1ef0-e62a-457c-8b19-55437044835d", // arrakis client creds
+                    "724f6386-6f00-4283-b8d7-8e8975bf2415"
+//                        "ea6e81fb-8fd1-488e-a92c-5d8aed74d8bb", // lorraine client creds
+//                        "575c29c2-06b9-492d-91fe-33cdb64c995f"
+//                        "26fac8fe-a39c-4fa5-8420-0b110ed99771", // lorraine normal
+//                        "8cf11973-653c-4295-9bc0-b0979f47a8c7"
+                )
+//                        .setRedirectUri("https://redirect_url/") // Leave out for authentication with client credentials
+                        .setScopes(OAUTH_SCOPES) // List of scopes to request to be granted to the access token.
+//                        .setRefreshTokenCallback(token -> { // Optional callback method to be triggered when token is refreshed.
+//                            LOG.info("Auto refresh triggered!");
+//                            LOG.info(String.format("Refresh token used: %s", token.getRefreshToken()));
+//                            LOG.info(String.format("New access token: %s", token.getAccessToken()));
+//                            LOG.info(String.format("New access token expiration date: %s", token.getAccessTokenExpiration()));
+//                        })
+//                )
+//                        .setRedirectUri("https://example.com/")
+//                token -> { // OAuth2 refresh token callback
+//                    LOG.info("Auto refresh triggered!");
+//                    LOG.info(String.format("Refresh token used: %s", token.getRefreshToken()));
+//                    LOG.info(String.format("New access token: %s", token.getAccessToken()));
+//                    LOG.info(String.format("New access token expiration date: %s", token.getAccessTokenExpiration()));
+//                }
+                        .build()
+>>>>>>> Stashed changes
         );
         app.listItems();
-        app.uploadFile("/path/to/file.ext");
+//        app.uploadFile("/path/to/file.ext");
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(AppSample.class);
